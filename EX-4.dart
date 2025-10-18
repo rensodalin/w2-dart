@@ -1,84 +1,72 @@
-enum DeliveryType { DELIVERY , PICKUP }
+enum Deliver { DELIVERED, PICKED_UP }
 
-class Product { 
-  final String name ;
-  final double price ;
+class Customer {
+  final String name;
+  int? age;
+  String address;
 
-  const Product ( {required this.name ,  required this.price} );
+  Customer({required this.name, this.age, required this.address});
+}
 
-  @override
-  String toString() => '$name: \$$price.toStringAsFixed(2)' ;
+class Product {
+  final String name;
+  final double price;
+
+  Product({required this.name, required this.price});
 }
 
 class OrderItem {
-  final Product product; 
-  final int quantity ;
+  Product product;
+  int quantity;
 
-  OrderItem( { required this.product , required this.quantity});
-
-  double getTotal() => product.price * quantity ;
-
-  @override
-  String toString() => '${product.name} x $quantity: \$${getTotal().toStringAsFixed(2)}' ;
-
+  OrderItem({required this.product, required this.quantity});
 }
 
 class Order {
-  final int id;
-  final List<OrderItem> items;
-  final DeliveryType deliveryType;
-  final String? address;
+  final Customer customer;
+  double deliveryFee;
+  List<OrderItem> orderedItems;
+  Deliver deliveryType;
 
-  const Order({
-    required this.id,
-    required this.items,
-    required this.deliveryType,
-    this.address,
-  });
+  Order.delivered({required this.customer, required this.deliveryFee})
+    : deliveryType = Deliver.DELIVERED,
+      orderedItems = [];
+  Order.pickedUp({required this.customer})
+    : deliveryType = Deliver.PICKED_UP,
+      deliveryFee = 0,
+      orderedItems = [];
 
-  double getTotalAmount () {
-    double total = 0 ;
-    for (var item in items) {
-      total += item.getTotal() ;
-    }
-    if(deliveryType == DeliveryType.DELIVERY) {
-      total += 5.0 ; 
-    }
-    return total ;
+  void addOrderItem(Product product, int quantity) {
+    orderedItems.add(OrderItem(product: product, quantity: quantity));
   }
-  @override
-  String toString() {
-    String itemDetails = items.map((item) => item.toString()).join(', ');
-    String deliveryInfo = deliveryType == DeliveryType.DELIVERY
-        ? 'Delivery to $address'
-        : 'Pickup';
-    return 'Order #$id: [$itemDetails], $deliveryInfo, Total: \$${getTotalAmount().toStringAsFixed(2)}';
+
+  void totalPrice() {
+    double total = 0;
+    for (OrderItem item in orderedItems) {
+      total += item.product.price * item.quantity;
+    }
+    if (deliveryType == Deliver.DELIVERED) total += deliveryFee;
+    print('Total price: \$${total}');
   }
 }
 
-void main () {
-  final p1 = Product(name: 'Coffee', price: 3.5);
-  final p2 = Product(name: 'Cake', price: 4.0);
-  final p3 = Product(name: 'Sandwich', price: 5.5);
+void main() {
+  var customer = Customer(name: 'Menghan', address: 'Phnom Penh', age: 20);
+  var laptop = Product(name: 'Laptop', price: 500.0);
+  var keyboard = Product(name: 'Keyboard', price: 20.0);
+  var mouse = Product(name: 'Mouse', price: 5.0);
 
-  // Sample orders
-  final order1 = Order(
-    id: 1,
-    items: [
-      OrderItem(product: p1, quantity: 2),
-      OrderItem(product: p2, quantity: 1),
-    ],
-    deliveryType: DeliveryType.DELIVERY,
-    address: 'Phnom Penh, Cambodia',
-  );
+  print('Delivery order: ');
+  var orderDelivered = Order.delivered(customer: customer, deliveryFee: 2.0);
+  orderDelivered.addOrderItem(laptop, 1);
+  orderDelivered.addOrderItem(keyboard, 1);
+  orderDelivered.addOrderItem(mouse, 1);
+  orderDelivered.totalPrice();
 
-  final order2 = Order(
-    id: 2,
-    items: [OrderItem(product: p3, quantity: 3)],
-    deliveryType: DeliveryType.PICKUP,
-  );
-
-  // Test output
-  print(order1);
-  print(order2);
+  print('Pick up order: ');
+  var orderPickedUp = Order.pickedUp(customer: customer);
+  orderPickedUp.addOrderItem(laptop, 2);
+  orderPickedUp.addOrderItem(keyboard, 1);
+  orderPickedUp.addOrderItem(mouse, 1);
+  orderPickedUp.totalPrice();
 }
