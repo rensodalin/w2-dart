@@ -51,10 +51,10 @@ class Order {
 }
 
 void main() {
-  var customer = Customer(name: 'Menghan', address: 'Phnom Penh', age: 20);
-  var laptop = Product(name: 'Laptop', price: 500.0);
-  var keyboard = Product(name: 'Keyboard', price: 20.0);
-  var mouse = Product(name: 'Mouse', price: 5.0);
+  var customer = Customer(name: 'Dalin', address: 'Siem Reap', age: 20);
+  var laptop = Product(name: 'Laptop', price: 100.0);
+  var keyboard = Product(name: 'Iphone', price: 30.0);
+  var mouse = Product(name: 'Doll', price: 5.0);
 
   print('Delivery order: ');
   var orderDelivered = Order.delivered(customer: customer, deliveryFee: 2.0);
